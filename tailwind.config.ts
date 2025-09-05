@@ -26,7 +26,8 @@ export default {
 				foreground: 'hsl(var(--foreground))',
 				primary: {
 					DEFAULT: 'hsl(var(--primary))',
-					foreground: 'hsl(var(--primary-foreground))'
+					foreground: 'hsl(var(--primary-foreground))',
+					glow: 'hsl(var(--primary-glow))'
 				},
 				secondary: {
 					DEFAULT: 'hsl(var(--secondary))',
@@ -42,7 +43,8 @@ export default {
 				},
 				accent: {
 					DEFAULT: 'hsl(var(--accent))',
-					foreground: 'hsl(var(--accent-foreground))'
+					foreground: 'hsl(var(--accent-foreground))',
+					glow: 'hsl(var(--accent-glow))'
 				},
 				popover: {
 					DEFAULT: 'hsl(var(--popover))',
@@ -52,15 +54,30 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
-				sidebar: {
-					DEFAULT: 'hsl(var(--sidebar-background))',
-					foreground: 'hsl(var(--sidebar-foreground))',
-					primary: 'hsl(var(--sidebar-primary))',
-					'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
-					accent: 'hsl(var(--sidebar-accent))',
-					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
-					border: 'hsl(var(--sidebar-border))',
-					ring: 'hsl(var(--sidebar-ring))'
+				health: {
+					DEFAULT: 'hsl(var(--health))',
+					foreground: 'hsl(var(--health-foreground))',
+					glow: 'hsl(var(--health-glow))'
+				},
+				knowledge: {
+					DEFAULT: 'hsl(var(--knowledge))',
+					foreground: 'hsl(var(--knowledge-foreground))',
+					glow: 'hsl(var(--knowledge-glow))'
+				},
+				creativity: {
+					DEFAULT: 'hsl(var(--creativity))',
+					foreground: 'hsl(var(--creativity-foreground))',
+					glow: 'hsl(var(--creativity-glow))'
+				},
+				discipline: {
+					DEFAULT: 'hsl(var(--discipline))',
+					foreground: 'hsl(var(--discipline-foreground))',
+					glow: 'hsl(var(--discipline-glow))'
+				},
+				relationships: {
+					DEFAULT: 'hsl(var(--relationships))',
+					foreground: 'hsl(var(--relationships-foreground))',
+					glow: 'hsl(var(--relationships-glow))'
 				}
 			},
 			borderRadius: {
@@ -84,11 +101,17 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'scale-102': {
+					'0%': { transform: 'scale(1)' },
+					'100%': { transform: 'scale(1.02)' }
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'pulse-glow': 'pulse-glow 2s ease-in-out infinite',
+				'scale-102': 'scale-102 0.2s ease-out'
 			}
 		}
 	},
