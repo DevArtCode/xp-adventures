@@ -1,110 +1,152 @@
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Domain, DOMAIN_NAMES, DOMAIN_ICONS } from "@/types/game";
-import { Plus, Sparkles } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Quest, Domain, QuestPriority, DOMAIN_NAMES, DOMAIN_ICONS, PRIORITY_LABELS } from "@/types/game";
+import { Plus, Calendar, Zap } from "lucide-react";
 
 interface AddQuestFormProps {
-  onAddQuest: (quest: {
-    title: string;
-    description: string;
-    domain: Domain;
-    xp: number;
-    dueDate?: Date;
-  }) => void;
+  onAddQuest: (quest: Omit<Quest, 'id' | 'completed' | 'createdAt'>) => void;
+  customCategories: string[];
 }
 
-export function AddQuestForm({ onAddQuest }: AddQuestFormProps) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [domain, setDomain] = useState<Domain>("health");
-  const [xp, setXp] = useState(50);
-  const [dueDate, setDueDate] = useState("");
+export function AddQuestForm({ onAddQuest, customCategories }: AddQuestFormProps) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [formData, setFormData] = useState({
+    title: "",
+    description: "",
+    domain: "health" as Domain,
+    xp: 10,
+    priority: "medium" as QuestPriority,
+    recurrence: "none" as const,
+    category: "",
+    dueDate: ""
+  });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!title.trim()) return;
-
-    onAddQuest({
-      title: title.trim(),
-      description: description.trim(),
-      domain,
-      xp,
-      dueDate: dueDate ? new Date(dueDate) : undefined
-    });
-
-    // Reset form
-    setTitle("");
-    setDescription("");
-    setDomain("health");
-    setXp(50);
-    setDueDate("");
-    setIsOpen(false);
+    if (formData.title.trim()) {
+      onAddQuest({
+        title: formData.title,
+        description: formData.description,
+        domain: formData.domain,
+        xp: formData.xp,
+        priority: formData.priority,
+        recurrence: formData.recurrence,
+        category: formData.category || undefined,
+        dueDate: formData.dueDate ? new Date(formData.dueDate) : undefined,
+      });
+      
+      setFormData({
+        title: "",
+        description: "",
+        domain: "health",
+        xp: 10,
+        priority: "medium",
+        recurrence: "none",
+        category: "",
+        dueDate: ""
+      });
+      setIsExpanded(false);
+    }
   };
 
-  if (!isOpen) {
+  const handleQuickAdd = () => {
+    if (formData.title.trim()) {
+      onAddQuest({
+        title: formData.title,
+        description: "",
+        domain: formData.domain,
+        xp: 10,
+        priority: "medium",
+        recurrence: "none"
+      });
+      setFormData(prev => ({ ...prev, title: "" }));
+    }
+  };
+
+  if (!isExpanded) {
     return (
-      <Card className="card-glow transition-smooth hover:scale-102 cursor-pointer" onClick={() => setIsOpen(true)}>
-        <CardContent className="flex items-center justify-center py-8">
-          <div className="text-center">
-            <Plus className="h-12 w-12 text-primary mx-auto mb-2" />
-            <p className="text-lg font-medium text-glow">Créer une nouvelle quête</p>
-            <p className="text-sm text-muted-foreground">Transformez vos tâches en aventures épiques</p>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="space-y-4">
+        <div className="flex gap-2">
+          <Input
+            placeholder="Nouvelle quête rapide..."
+            value={formData.title}
+            onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+            onKeyDown={(e) => e.key === 'Enter' && handleQuickAdd()}
+            className="flex-1"
+          />
+          <Select value={formData.domain} onValueChange={(domain: Domain) => setFormData(prev => ({ ...prev, domain }))}>
+            <SelectTrigger className="w-40">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {Object.entries(DOMAIN_NAMES).map(([key, name]) => (
+                <SelectItem key={key} value={key}>
+                  {DOMAIN_ICONS[key as Domain]} {name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Button onClick={handleQuickAdd} disabled={!formData.title.trim()}>
+            <Plus className="h-4 w-4" />
+          </Button>
+        </div>
+        
+        <Button 
+          variant="outline" 
+          onClick={() => setIsExpanded(true)}
+          className="w-full"
+        >
+          <Zap className="h-4 w-4 mr-2" />
+          Créer une quête avancée
+        </Button>
+      </div>
     );
   }
 
   return (
-    <Card className="card-glow">
+    <Card className="border-primary/20">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Sparkles className="h-5 w-5 text-primary" />
-          Nouvelle Quête
-        </CardTitle>
-        <CardDescription>
-          Créez une nouvelle quête pour votre progression RPG
-        </CardDescription>
+        <CardTitle className="text-lg">Nouvelle Quête</CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
+            <Label htmlFor="title">Titre de la quête *</Label>
             <Input
-              placeholder="Titre de la quête (ex: Faire 30 min de sport)"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              id="title"
+              value={formData.title}
+              onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+              placeholder="Ex: Faire 30 minutes de sport"
               required
             />
           </div>
 
           <div>
+            <Label htmlFor="description">Description</Label>
             <Textarea
-              placeholder="Description optionnelle..."
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              rows={2}
+              id="description"
+              value={formData.description}
+              onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+              placeholder="Détails optionnels sur la quête"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Select value={domain} onValueChange={(value: Domain) => setDomain(value)}>
+              <Label>Domaine</Label>
+              <Select value={formData.domain} onValueChange={(domain: Domain) => setFormData(prev => ({ ...prev, domain }))}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   {Object.entries(DOMAIN_NAMES).map(([key, name]) => (
                     <SelectItem key={key} value={key}>
-                      <span className="flex items-center gap-2">
-                        <span>{DOMAIN_ICONS[key as Domain]}</span>
-                        <span>{name}</span>
-                      </span>
+                      {DOMAIN_ICONS[key as Domain]} {name}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -112,40 +154,75 @@ export function AddQuestForm({ onAddQuest }: AddQuestFormProps) {
             </div>
 
             <div>
+              <Label>Priorité</Label>
+              <Select value={formData.priority} onValueChange={(priority: QuestPriority) => setFormData(prev => ({ ...prev, priority }))}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.entries(PRIORITY_LABELS).map(([key, label]) => (
+                    <SelectItem key={key} value={key}>
+                      {label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="xp">Points XP</Label>
               <Input
+                id="xp"
                 type="number"
-                placeholder="XP"
-                value={xp}
-                onChange={(e) => setXp(Number(e.target.value))}
-                min={10}
-                max={500}
-                step={10}
+                min="1"
+                max="100"
+                value={formData.xp}
+                onChange={(e) => setFormData(prev => ({ ...prev, xp: parseInt(e.target.value) || 10 }))}
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="dueDate">Échéance</Label>
+              <Input
+                id="dueDate"
+                type="date"
+                value={formData.dueDate}
+                onChange={(e) => setFormData(prev => ({ ...prev, dueDate: e.target.value }))}
               />
             </div>
           </div>
 
-          <div>
-            <Input
-              type="date"
-              value={dueDate}
-              onChange={(e) => setDueDate(e.target.value)}
-            />
-          </div>
+          {customCategories.length > 0 && (
+            <div>
+              <Label>Catégorie</Label>
+              <Select value={formData.category} onValueChange={(category) => setFormData(prev => ({ ...prev, category }))}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Sélectionner une catégorie" />
+                </SelectTrigger>
+                <SelectContent>
+                  {customCategories.map((category) => (
+                    <SelectItem key={category} value={category}>
+                      {category}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
-          <div className="flex gap-2 justify-end">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setIsOpen(false)}
+          <div className="flex gap-2 pt-4">
+            <Button type="submit" className="gradient-primary flex-1">
+              <Plus className="h-4 w-4 mr-2" />
+              Créer la quête
+            </Button>
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={() => setIsExpanded(false)}
             >
               Annuler
-            </Button>
-            <Button
-              type="submit"
-              className="gradient-primary text-white border-0 hover:opacity-90"
-            >
-              <Plus className="h-4 w-4 mr-1" />
-              Créer la quête
             </Button>
           </div>
         </form>

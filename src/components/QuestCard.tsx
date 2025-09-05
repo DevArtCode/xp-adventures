@@ -1,8 +1,8 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Quest, DOMAIN_COLORS, DOMAIN_NAMES, DOMAIN_ICONS } from "@/types/game";
-import { CheckCircle, Clock, Trash2, Zap } from "lucide-react";
+import { Quest, DOMAIN_COLORS, DOMAIN_NAMES, DOMAIN_ICONS, PRIORITY_COLORS, PRIORITY_LABELS } from "@/types/game";
+import { CheckCircle, Clock, Trash2, Zap, AlertCircle, Repeat } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface QuestCardProps {
@@ -42,6 +42,21 @@ export function QuestCard({ quest, onComplete, onDelete }: QuestCardProps) {
             )}>
               {domainName}
             </Badge>
+            {quest.priority !== 'medium' && (
+              <Badge variant="outline" className={cn(
+                "text-xs",
+                PRIORITY_COLORS[quest.priority]
+              )}>
+                <AlertCircle className="h-3 w-3 mr-1" />
+                {PRIORITY_LABELS[quest.priority]}
+              </Badge>
+            )}
+            {quest.recurrence !== 'none' && (
+              <Badge variant="outline" className="text-xs">
+                <Repeat className="h-3 w-3 mr-1" />
+                Récurrent
+              </Badge>
+            )}
           </div>
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-1 text-accent">
