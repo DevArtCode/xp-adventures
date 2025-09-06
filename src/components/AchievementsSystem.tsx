@@ -37,13 +37,37 @@ export function AchievementsSystem({ stats, completedQuests }: AchievementsSyste
       return acc;
     }, {} as Record<string, number>);
 
+    // Calculate daily and weekly intensity
+    const today = new Date();
+    const todayStr = today.toDateString();
+    const weekStart = new Date(today);
+    weekStart.setDate(today.getDate() - today.getDay());
+    
+    const todayQuests = completedQuests.filter(q => 
+      q.completedAt && new Date(q.completedAt).toDateString() === todayStr
+    );
+    const weekQuests = completedQuests.filter(q => 
+      q.completedAt && new Date(q.completedAt) >= weekStart
+    );
+
     return [
       // XP Milestones
+      {
+        id: 'first_steps',
+        title: 'Premiers Pas',
+        description: 'Atteindre 100 XP total',
+        icon: <Star className="h-5 w-5" />,
+        type: 'milestone',
+        requirement: 100,
+        current: stats.totalXP,
+        unlocked: stats.totalXP >= 100,
+        rarity: 'common'
+      },
       {
         id: 'novice',
         title: 'Novice Aventurier',
         description: 'Atteindre 500 XP total',
-        icon: <Star className="h-5 w-5" />,
+        icon: <Trophy className="h-5 w-5" />,
         type: 'milestone',
         requirement: 500,
         current: stats.totalXP,
@@ -53,17 +77,28 @@ export function AchievementsSystem({ stats, completedQuests }: AchievementsSyste
       {
         id: 'experienced',
         title: 'Aventurier Expérimenté',
-        description: 'Atteindre 2000 XP total',
-        icon: <Trophy className="h-5 w-5" />,
+        description: 'Atteindre 1000 XP total',
+        icon: <Crown className="h-5 w-5" />,
         type: 'milestone',
-        requirement: 2000,
+        requirement: 1000,
         current: stats.totalXP,
-        unlocked: stats.totalXP >= 2000,
+        unlocked: stats.totalXP >= 1000,
         rarity: 'rare'
       },
       {
+        id: 'expert',
+        title: 'Expert Légendaire',
+        description: 'Atteindre 5000 XP total',
+        icon: <Crown className="h-5 w-5" />,
+        type: 'milestone',
+        requirement: 5000,
+        current: stats.totalXP,
+        unlocked: stats.totalXP >= 5000,
+        rarity: 'epic'
+      },
+      {
         id: 'master',
-        title: 'Maître Aventurier',
+        title: 'Maître Ultime',
         description: 'Atteindre 10000 XP total',
         icon: <Crown className="h-5 w-5" />,
         type: 'milestone',
@@ -72,6 +107,7 @@ export function AchievementsSystem({ stats, completedQuests }: AchievementsSyste
         unlocked: stats.totalXP >= 10000,
         rarity: 'legendary'
       },
+      
       // Streak Achievements
       {
         id: 'consistent',
@@ -93,13 +129,71 @@ export function AchievementsSystem({ stats, completedQuests }: AchievementsSyste
         requirement: 30,
         current: stats.streak,
         unlocked: stats.streak >= 30,
+        rarity: 'rare'
+      },
+      {
+        id: 'centurion',
+        title: 'Centurion',
+        description: 'Maintenir une série de 100 jours',
+        icon: <Crown className="h-5 w-5" />,
+        type: 'streak',
+        requirement: 100,
+        current: stats.streak,
+        unlocked: stats.streak >= 100,
         rarity: 'epic'
       },
+      {
+        id: 'immortal',
+        title: 'Immortel',
+        description: 'Maintenir une série de 365 jours',
+        icon: <Crown className="h-5 w-5" />,
+        type: 'streak',
+        requirement: 365,
+        current: stats.streak,
+        unlocked: stats.streak >= 365,
+        rarity: 'legendary'
+      },
+      
+      // Intensity Achievements
+      {
+        id: 'productive_day',
+        title: 'Journée Productive',
+        description: 'Compléter 5 quêtes en un jour',
+        icon: <Zap className="h-5 w-5" />,
+        type: 'special',
+        requirement: 5,
+        current: todayQuests.length,
+        unlocked: todayQuests.length >= 5,
+        rarity: 'common'
+      },
+      {
+        id: 'super_productive',
+        title: 'Super Productif',
+        description: 'Compléter 10 quêtes en un jour',
+        icon: <Target className="h-5 w-5" />,
+        type: 'special',
+        requirement: 10,
+        current: todayQuests.length,
+        unlocked: todayQuests.length >= 10,
+        rarity: 'rare'
+      },
+      {
+        id: 'weekly_warrior',
+        title: 'Guerrier Hebdomadaire',
+        description: 'Compléter 25 quêtes en une semaine',
+        icon: <Award className="h-5 w-5" />,
+        type: 'special',
+        requirement: 25,
+        current: weekQuests.length,
+        unlocked: weekQuests.length >= 25,
+        rarity: 'epic'
+      },
+      
       // Quest Achievements
       {
         id: 'questmaster',
         title: 'Maître des Quêtes',
-        description: 'Compléter 100 quêtes',
+        description: 'Compléter 100 quêtes au total',
         icon: <Target className="h-5 w-5" />,
         type: 'special',
         requirement: 100,
@@ -107,27 +201,61 @@ export function AchievementsSystem({ stats, completedQuests }: AchievementsSyste
         unlocked: totalCompleted >= 100,
         rarity: 'rare'
       },
+      
       // Domain Achievements
       {
         id: 'healthy',
         title: 'Gardien de la Santé',
-        description: 'Compléter 20 quêtes de Santé',
+        description: 'Compléter 50 quêtes de Santé',
         icon: <Award className="h-5 w-5" />,
         type: 'domain',
-        requirement: 20,
+        requirement: 50,
         current: domainCounts.health || 0,
-        unlocked: (domainCounts.health || 0) >= 20,
+        unlocked: (domainCounts.health || 0) >= 50,
         rarity: 'common'
       },
       {
         id: 'scholar',
         title: 'Érudit',
-        description: 'Compléter 20 quêtes de Savoirs',
+        description: 'Compléter 50 quêtes de Savoirs',
         icon: <Award className="h-5 w-5" />,
         type: 'domain',
-        requirement: 20,
+        requirement: 50,
         current: domainCounts.knowledge || 0,
-        unlocked: (domainCounts.knowledge || 0) >= 20,
+        unlocked: (domainCounts.knowledge || 0) >= 50,
+        rarity: 'common'
+      },
+      {
+        id: 'artist',
+        title: 'Artiste',
+        description: 'Compléter 50 quêtes de Créativité',
+        icon: <Award className="h-5 w-5" />,
+        type: 'domain',
+        requirement: 50,
+        current: domainCounts.creativity || 0,
+        unlocked: (domainCounts.creativity || 0) >= 50,
+        rarity: 'common'
+      },
+      {
+        id: 'disciplined',
+        title: 'Discipliné',
+        description: 'Compléter 50 quêtes de Discipline',
+        icon: <Award className="h-5 w-5" />,
+        type: 'domain',
+        requirement: 50,
+        current: domainCounts.discipline || 0,
+        unlocked: (domainCounts.discipline || 0) >= 50,
+        rarity: 'common'
+      },
+      {
+        id: 'social',
+        title: 'Papillon Social',
+        description: 'Compléter 50 quêtes de Relations',
+        icon: <Award className="h-5 w-5" />,
+        type: 'domain',
+        requirement: 50,
+        current: domainCounts.relationships || 0,
+        unlocked: (domainCounts.relationships || 0) >= 50,
         rarity: 'common'
       }
     ];

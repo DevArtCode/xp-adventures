@@ -56,15 +56,17 @@ const getInitialStats = (): PlayerStats => {
 };
 
 const calculateLevel = (totalXP: number): { level: number; currentXP: number; xpToNextLevel: number } => {
+  // Linear progression: Level 1 = 50 XP, Level 10 = 500 XP, Level 20 = 1000 XP
   let level = 1;
   let xpForCurrentLevel = 0;
-  let xpForNextLevel = 100;
   
-  while (totalXP >= xpForNextLevel) {
+  // Find current level using linear progression (50 * n)
+  while (xpForCurrentLevel + (50 * level) <= totalXP) {
+    xpForCurrentLevel += 50 * level;
     level++;
-    xpForCurrentLevel = xpForNextLevel;
-    xpForNextLevel = Math.floor(100 * Math.pow(1.2, level - 1));
   }
+  
+  const xpForNextLevel = xpForCurrentLevel + (50 * level);
   
   return {
     level,
@@ -252,6 +254,24 @@ export function useGameData() {
     }));
   };
 
+  const resetGame = () => {
+    const resetData = {
+      playerStats: getInitialStats(),
+      quests: [],
+      completedQuests: [],
+      questTemplates: [],
+      customCategories: ['Personnel', 'Travail', 'Formation', 'Sport', 'Social']
+    };
+    setGameData(resetData);
+  };
+
+  const deleteCategory = (categoryToDelete: string) => {
+    setGameData(prev => ({
+      ...prev,
+      customCategories: prev.customCategories.filter(cat => cat !== categoryToDelete)
+    }));
+  };
+
   return {
     gameData,
     addQuest,
@@ -260,6 +280,8 @@ export function useGameData() {
     addTemplate,
     createQuestFromTemplate,
     addCategory,
-    deleteTemplate
+    deleteTemplate,
+    resetGame,
+    deleteCategory
   };
 }
