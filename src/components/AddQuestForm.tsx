@@ -5,13 +5,22 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Quest, Domain, QuestPriority, DOMAIN_NAMES, DOMAIN_ICONS, PRIORITY_LABELS } from "@/types/game";
+import { Quest, Domain, QuestPriority, QuestRecurrence, RecurrenceConfig, DOMAIN_NAMES, DOMAIN_ICONS, PRIORITY_LABELS } from "@/types/game";
+import { RecurrenceConfig as RecurrenceConfigComponent } from "./RecurrenceConfig";
 import { Plus, Calendar, Zap } from "lucide-react";
 
 interface AddQuestFormProps {
   onAddQuest: (quest: Omit<Quest, 'id' | 'completed' | 'createdAt'>) => void;
   customCategories: string[];
 }
+
+const DOMAIN_CATEGORIES = {
+  health: ['Sport', 'Nutrition', 'Sommeil', 'Bien-être', 'Méditation'],
+  knowledge: ['Lecture', 'Études', 'Formation', 'Recherche', 'Apprentissage'],
+  creativity: ['Art', 'Musique', 'Écriture', 'Design', 'Innovation'],
+  discipline: ['Organisation', 'Travail', 'Productivité', 'Habitudes', 'Routine'],
+  relationships: ['Famille', 'Amis', 'Réseau', 'Communication', 'Social']
+};
 
 export function AddQuestForm({ onAddQuest, customCategories }: AddQuestFormProps) {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -21,10 +30,11 @@ export function AddQuestForm({ onAddQuest, customCategories }: AddQuestFormProps
     domain: "health" as Domain,
     xp: 10,
     priority: "medium" as QuestPriority,
-    recurrence: "none" as const,
+    recurrence: "none" as QuestRecurrence,
     category: "",
     dueDate: ""
   });
+  const [recurrenceConfig, setRecurrenceConfig] = useState<RecurrenceConfig | undefined>();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,6 +46,7 @@ export function AddQuestForm({ onAddQuest, customCategories }: AddQuestFormProps
         xp: formData.xp,
         priority: formData.priority,
         recurrence: formData.recurrence,
+        recurrenceConfig,
         category: formData.category || undefined,
         dueDate: formData.dueDate ? new Date(formData.dueDate) : undefined,
       });
@@ -50,6 +61,7 @@ export function AddQuestForm({ onAddQuest, customCategories }: AddQuestFormProps
         category: "",
         dueDate: ""
       });
+      setRecurrenceConfig(undefined);
       setIsExpanded(false);
     }
   };
@@ -194,23 +206,33 @@ export function AddQuestForm({ onAddQuest, customCategories }: AddQuestFormProps
             </div>
           </div>
 
-          {customCategories.length > 0 && (
-            <div>
-              <Label>Catégorie</Label>
-              <Select value={formData.category} onValueChange={(category) => setFormData(prev => ({ ...prev, category }))}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Sélectionner une catégorie" />
-                </SelectTrigger>
-                <SelectContent>
-                  {customCategories.map((category) => (
-                    <SelectItem key={category} value={category}>
-                      {category}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          )}
+          <div>
+            <Label>Catégorie</Label>
+            <Select value={formData.category} onValueChange={(category) => setFormData(prev => ({ ...prev, category }))}>
+              <SelectTrigger>
+                <SelectValue placeholder="Sélectionner une catégorie" />
+              </SelectTrigger>
+              <SelectContent>
+                {DOMAIN_CATEGORIES[formData.domain].map((category) => (
+                  <SelectItem key={category} value={category}>
+                    {category}
+                  </SelectItem>
+                ))}
+                {customCategories.map((category) => (
+                  <SelectItem key={category} value={category}>
+                    {category}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <RecurrenceConfigComponent
+            recurrence={formData.recurrence}
+            config={recurrenceConfig}
+            onRecurrenceChange={(recurrence) => setFormData(prev => ({ ...prev, recurrence }))}
+            onConfigChange={setRecurrenceConfig}
+          />
 
           <div className="flex gap-2 pt-4">
             <Button type="submit" className="gradient-primary flex-1">

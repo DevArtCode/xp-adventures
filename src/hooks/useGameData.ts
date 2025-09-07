@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { GameData, PlayerStats, Quest, Domain, DomainStats, QuestTemplate, QuestPriority } from '@/types/game';
+import { GameData, PlayerStats, Quest, Domain, DomainStats, QuestTemplate, QuestPriority, ShopItem } from '@/types/game';
 
 const STORAGE_KEY = 'rpg-productivity-game';
 
@@ -100,7 +100,9 @@ export function useGameData() {
           quests: parsed.quests || [],
           completedQuests: parsed.completedQuests || [],
           questTemplates: parsed.questTemplates || [],
-          customCategories: parsed.customCategories || ['Personnel', 'Travail', 'Formation', 'Sport', 'Social']
+          customCategories: parsed.customCategories || ['Personnel', 'Travail', 'Formation', 'Sport', 'Social'],
+          shopItems: parsed.shopItems || [],
+          questsCompletedToday: 0
         };
       }
     } catch (error) {
@@ -112,7 +114,9 @@ export function useGameData() {
       quests: [],
       completedQuests: [],
       questTemplates: [],
-      customCategories: ['Personnel', 'Travail', 'Formation', 'Sport', 'Social']
+      customCategories: ['Personnel', 'Travail', 'Formation', 'Sport', 'Social'],
+      shopItems: [],
+      questsCompletedToday: 0
     };
   });
 
@@ -178,10 +182,16 @@ export function useGameData() {
       // Calculate gold reward (based on XP and level)
       const goldReward = Math.floor(bonusXP * 0.5) + Math.floor(levelData.level * 0.2);
 
+      // Calculate today's completed quests
+      const todayCompleted = prev.completedQuests.filter(q => 
+        q.completedAt && new Date(q.completedAt).toDateString() === today
+      ).length + 1;
+
       return {
         ...prev,
         quests: prev.quests.filter(q => q.id !== questId),
         completedQuests: [...prev.completedQuests, completedQuest],
+        questsCompletedToday: todayCompleted,
         playerStats: {
           ...prev.playerStats,
           ...levelData,
@@ -254,13 +264,41 @@ export function useGameData() {
     }));
   };
 
+  const purchaseItem = (itemId: string) => {
+    setGameData(prev => {
+      const item = prev.shopItems?.find(i => i.id === itemId);
+      if (!item || item.unlocked || prev.playerStats.gold < item.price) return prev;
+
+      const updatedShopItems = prev.shopItems?.map(i => 
+        i.id === itemId ? { ...i, unlocked: true } : i
+      ) || [];
+
+      return {
+        ...prev,
+        shopItems: updatedShopItems,
+        playerStats: {
+          ...prev.playerStats,
+          gold: prev.playerStats.gold - item.price,
+          avatar: {
+            ...prev.playerStats.avatar,
+            accessories: item.type === 'avatar' 
+              ? [...prev.playerStats.avatar.accessories, item.id]
+              : prev.playerStats.avatar.accessories
+          }
+        }
+      };
+    });
+  };
+
   const resetGame = () => {
     const resetData = {
       playerStats: getInitialStats(),
       quests: [],
       completedQuests: [],
       questTemplates: [],
-      customCategories: ['Personnel', 'Travail', 'Formation', 'Sport', 'Social']
+      customCategories: ['Personnel', 'Travail', 'Formation', 'Sport', 'Social'],
+      shopItems: [],
+      questsCompletedToday: 0
     };
     setGameData(resetData);
   };
@@ -282,6 +320,7 @@ export function useGameData() {
     addCategory,
     deleteTemplate,
     resetGame,
-    deleteCategory
+    deleteCategory,
+    purchaseItem
   };
 }

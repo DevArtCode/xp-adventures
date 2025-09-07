@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useGameData } from "@/hooks/useGameData";
 import { useSoundEffects } from "@/hooks/useSoundEffects";
 import { AddQuestForm } from "@/components/AddQuestForm";
@@ -13,9 +13,10 @@ import { QuestFilters } from "@/components/QuestFilters";
 import { NotificationSystem } from "@/components/NotificationSystem";
 import { CompletedQuestsList } from "@/components/CompletedQuestsList";
 import { UnlockedZones } from "@/components/UnlockedZones";
+import { ZoneInterface } from "@/components/ZoneInterface";
 import { GameSettings } from "@/components/GameSettings";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Sword, Trophy, BarChart3, User, Settings, Target, Map } from "lucide-react";
+import { Sword, Trophy, BarChart3, User, Settings, Target, Map, ShoppingBag } from "lucide-react";
 
 export default function Index() {
   const { 
@@ -28,11 +29,18 @@ export default function Index() {
     deleteTemplate,
     addCategory,
     deleteCategory,
-    resetGame
+    resetGame,
+    purchaseItem
   } = useGameData();
   
   const { playQuestComplete } = useSoundEffects();
-  const [selectedZone, setSelectedZone] = useState("training");
+  const [selectedZone, setSelectedZone] = useState<string | null>(null);
+  
+  // Calculate quests completed today
+  const today = new Date().toDateString();
+  const questsCompletedToday = gameData.completedQuests.filter(quest => 
+    quest.completedAt && new Date(quest.completedAt).toDateString() === today
+  ).length;
   
   const handleQuestComplete = (questId: string) => {
     completeQuest(questId);
@@ -50,13 +58,13 @@ export default function Index() {
               Transformez votre vie en aventure épique !
             </p>
           </div>
-          <StatsCard stats={gameData.playerStats} />
+          <StatsCard stats={gameData.playerStats} questsCompletedToday={questsCompletedToday} />
         </div>
       </div>
 
       <div className="container mx-auto px-4 pb-8">
         <Tabs defaultValue="quests" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-7">
+          <TabsList className="grid w-full grid-cols-8">
             <TabsTrigger value="quests" className="flex items-center gap-2">
               <Sword className="h-4 w-4" />
               Quêtes
@@ -68,6 +76,10 @@ export default function Index() {
             <TabsTrigger value="zones" className="flex items-center gap-2">
               <Map className="h-4 w-4" />
               Zones
+            </TabsTrigger>
+            <TabsTrigger value="shop" className="flex items-center gap-2">
+              <ShoppingBag className="h-4 w-4" />
+              Boutique
             </TabsTrigger>
             <TabsTrigger value="achievements" className="flex items-center gap-2">
               <Trophy className="h-4 w-4" />
@@ -118,25 +130,33 @@ export default function Index() {
           </TabsContent>
 
           <TabsContent value="zones" className="space-y-6">
-            <UnlockedZones 
+            {selectedZone ? (
+              <ZoneInterface
+                selectedZone={selectedZone}
+                stats={gameData.playerStats}
+                completedQuests={gameData.completedQuests}
+                shopItems={gameData.shopItems || []}
+                onPurchase={purchaseItem}
+                onBack={() => setSelectedZone(null)}
+              />
+            ) : (
+              <UnlockedZones 
+                stats={gameData.playerStats}
+                onZoneSelect={setSelectedZone}
+                selectedZone=""
+              />
+            )}
+          </TabsContent>
+
+          <TabsContent value="shop" className="space-y-6">
+            <ZoneInterface
+              selectedZone="shop"
               stats={gameData.playerStats}
-              onZoneSelect={setSelectedZone}
-              selectedZone={selectedZone}
+              completedQuests={gameData.completedQuests}
+              shopItems={gameData.shopItems || []}
+              onPurchase={purchaseItem}
+              onBack={() => {}}
             />
-            
-            {selectedZone === "training" && gameData.playerStats.level >= 5 && (
-              <DetailedStats 
-                stats={gameData.playerStats} 
-                completedQuests={gameData.completedQuests}
-              />
-            )}
-            
-            {selectedZone === "trophy-hall" && gameData.playerStats.level >= 15 && (
-              <AchievementsSystem 
-                stats={gameData.playerStats} 
-                completedQuests={gameData.completedQuests}
-              />
-            )}
           </TabsContent>
 
           <TabsContent value="achievements" className="space-y-6">

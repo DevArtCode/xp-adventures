@@ -5,9 +5,10 @@ import { Zap, Trophy, Target, Flame } from "lucide-react";
 
 interface StatsCardProps {
   stats: PlayerStats;
+  questsCompletedToday?: number;
 }
 
-export function StatsCard({ stats }: StatsCardProps) {
+export function StatsCard({ stats, questsCompletedToday = 0 }: StatsCardProps) {
   const progressPercentage = (stats.currentXP / stats.xpToNextLevel) * 100;
 
   return (
@@ -58,7 +59,7 @@ export function StatsCard({ stats }: StatsCardProps) {
           <Target className="h-4 w-4 text-health" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold text-glow">0</div>
+          <div className="text-2xl font-bold text-glow">{questsCompletedToday}</div>
           <p className="text-xs text-muted-foreground">
             Accomplies aujourd'hui
           </p>

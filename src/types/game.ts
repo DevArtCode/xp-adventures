@@ -75,12 +75,23 @@ export interface QuestTemplate {
   subQuests?: Omit<SubQuest, 'id' | 'completed'>[];
 }
 
+export interface ShopItem {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  type: 'avatar' | 'effect' | 'boost';
+  unlocked: boolean;
+}
+
 export interface GameData {
   playerStats: PlayerStats;
   quests: Quest[];
   completedQuests: Quest[];
   questTemplates: QuestTemplate[];
   customCategories: string[];
+  shopItems?: ShopItem[];
+  questsCompletedToday?: number;
 }
 
 export const DOMAIN_COLORS: Record<Domain, string> = {
