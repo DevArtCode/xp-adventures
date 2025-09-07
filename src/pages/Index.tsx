@@ -7,6 +7,7 @@ import { StatsCard } from "@/components/StatsCard";
 import { QuestTemplates } from "@/components/QuestTemplates";
 import { DomainLevels } from "@/components/DomainLevels";
 import { Avatar } from "@/components/Avatar";
+import { AvatarCustomization } from "@/components/AvatarCustomization";
 import { AchievementsSystem } from "@/components/AchievementsSystem";
 import { DetailedStats } from "@/components/DetailedStats";
 import { QuestFilters } from "@/components/QuestFilters";
@@ -35,6 +36,7 @@ export default function Index() {
   
   const { playQuestComplete } = useSoundEffects();
   const [selectedZone, setSelectedZone] = useState<string | null>(null);
+  const [showAvatarCustomization, setShowAvatarCustomization] = useState(false);
   
   // Calculate quests completed today
   const today = new Date().toDateString();
@@ -125,8 +127,24 @@ export default function Index() {
           </TabsContent>
 
           <TabsContent value="avatar" className="space-y-6">
-            <Avatar avatar={gameData.playerStats.avatar} playerLevel={gameData.playerStats.level} />
-            <DomainLevels stats={gameData.playerStats} />
+            {showAvatarCustomization ? (
+              <AvatarCustomization
+                playerStats={gameData.playerStats}
+                shopItems={gameData.shopItems || []}
+                onPurchase={purchaseItem}
+                onBack={() => setShowAvatarCustomization(false)}
+              />
+            ) : (
+              <>
+                <Avatar 
+                  avatar={gameData.playerStats.avatar} 
+                  playerLevel={gameData.playerStats.level}
+                  shopItems={gameData.shopItems || []}
+                  onCustomize={() => setShowAvatarCustomization(true)}
+                />
+                <DomainLevels stats={gameData.playerStats} />
+              </>
+            )}
           </TabsContent>
 
           <TabsContent value="zones" className="space-y-6">

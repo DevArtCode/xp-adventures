@@ -12,6 +12,7 @@ interface ShopProps {
 }
 
 const DEFAULT_SHOP_ITEMS: ShopItem[] = [
+  // Avatar Items
   {
     id: 'avatar_crown',
     name: 'Couronne Dorée',
@@ -29,19 +30,45 @@ const DEFAULT_SHOP_ITEMS: ShopItem[] = [
     unlocked: false
   },
   {
+    id: 'avatar_sword',
+    name: 'Épée Légendaire',
+    description: 'Une épée brillante pour les vrais guerriers',
+    price: 250,
+    type: 'avatar',
+    unlocked: false
+  },
+  {
+    id: 'avatar_armor',
+    name: 'Armure Mystique',
+    description: 'Protection magique pour les quêtes difficiles',
+    price: 200,
+    type: 'avatar',
+    unlocked: false
+  },
+  {
+    id: 'avatar_wings',
+    name: 'Ailes d\'Ange',
+    description: 'Des ailes lumineuses pour voler vers la victoire',
+    price: 400,
+    type: 'avatar',
+    unlocked: false
+  },
+  {
+    id: 'avatar_halo',
+    name: 'Auréole Divine',
+    description: 'Un halo sacré pour les âmes pures',
+    price: 300,
+    type: 'avatar',
+    unlocked: false
+  },
+  
+  // Boost Items
+  {
     id: 'xp_boost',
     name: 'Potion d\'XP',
     description: '+50% XP pendant 24h',
     price: 75,
     type: 'boost',
-    unlocked: false
-  },
-  {
-    id: 'golden_effect',
-    name: 'Effet Doré',
-    description: 'Particules dorées autour de votre avatar',
-    price: 200,
-    type: 'effect',
     unlocked: false
   },
   {
@@ -53,11 +80,61 @@ const DEFAULT_SHOP_ITEMS: ShopItem[] = [
     unlocked: false
   },
   {
-    id: 'avatar_sword',
-    name: 'Épée Légendaire',
-    description: 'Une épée brillante pour les vrais guerriers',
-    price: 250,
-    type: 'avatar',
+    id: 'streak_shield',
+    name: 'Bouclier de Série',
+    description: 'Protège votre streak pendant 3 jours d\'absence',
+    price: 500,
+    type: 'boost',
+    unlocked: false
+  },
+  {
+    id: 'mega_boost',
+    name: 'Méga Boost',
+    description: 'Triple XP et or pendant 6h',
+    price: 400,
+    type: 'boost',
+    unlocked: false
+  },
+  
+  // Effect Items
+  {
+    id: 'golden_effect',
+    name: 'Effet Doré',
+    description: 'Particules dorées autour de votre avatar',
+    price: 200,
+    type: 'effect',
+    unlocked: false
+  },
+  {
+    id: 'rainbow_trail',
+    name: 'Traînée Arc-en-ciel',
+    description: 'Une traînée colorée suit vos mouvements',
+    price: 350,
+    type: 'effect',
+    unlocked: false
+  },
+  {
+    id: 'fire_aura',
+    name: 'Aura de Feu',
+    description: 'Flammes dansantes autour de votre personnage',
+    price: 450,
+    type: 'effect',
+    unlocked: false
+  },
+  {
+    id: 'lightning_effect',
+    name: 'Éclairs Cosmiques',
+    description: 'Des éclairs violets crépitent autour de vous',
+    price: 600,
+    type: 'effect',
+    unlocked: false
+  },
+  {
+    id: 'star_field',
+    name: 'Champ d\'Étoiles',
+    description: 'Un cosmos miniature vous entoure',
+    price: 800,
+    type: 'effect',
     unlocked: false
   }
 ];

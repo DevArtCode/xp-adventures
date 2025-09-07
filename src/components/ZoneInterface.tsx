@@ -16,6 +16,7 @@ import { cn } from "@/lib/utils";
 import { DetailedStats } from "./DetailedStats";
 import { AchievementsSystem } from "./AchievementsSystem";
 import { Shop } from "./Shop";
+import { ZoneContent } from "./ZoneContent";
 
 interface ZoneInterfaceProps {
   selectedZone: string;
@@ -170,52 +171,8 @@ export function ZoneInterface({
         />
       )}
       
-      {selectedZone === 'market' && (
-        <Card>
-          <CardContent className="p-6 text-center">
-            <Palette className="h-12 w-12 mx-auto mb-4 text-creativity" />
-            <h3 className="text-lg font-semibold mb-2">Customisation</h3>
-            <p className="text-muted-foreground">
-              Cette zone sera bientôt disponible avec des options de personnalisation avancées !
-            </p>
-          </CardContent>
-        </Card>
-      )}
-      
-      {selectedZone === 'library' && (
-        <Card>
-          <CardContent className="p-6 text-center">
-            <BookOpen className="h-12 w-12 mx-auto mb-4 text-knowledge" />
-            <h3 className="text-lg font-semibold mb-2">Bibliothèque de Sagesse</h3>
-            <p className="text-muted-foreground">
-              Citations motivantes et conseils de productivité arriveront bientôt !
-            </p>
-          </CardContent>
-        </Card>
-      )}
-      
-      {selectedZone === 'arena' && (
-        <Card>
-          <CardContent className="p-6 text-center">
-            <Swords className="h-12 w-12 mx-auto mb-4 text-destructive" />
-            <h3 className="text-lg font-semibold mb-2">Arène des Défis</h3>
-            <p className="text-muted-foreground">
-              Mode défi hardcore avec risques et récompenses à venir !
-            </p>
-          </CardContent>
-        </Card>
-      )}
-      
-      {selectedZone === 'sanctuary' && (
-        <Card>
-          <CardContent className="p-6 text-center">
-            <Crown className="h-12 w-12 mx-auto mb-4 text-accent" />
-            <h3 className="text-lg font-semibold mb-2">Sanctuaire Légendaire</h3>
-            <p className="text-muted-foreground">
-              Quêtes légendaires avec des récompenses extraordinaires arrivent !
-            </p>
-          </CardContent>
-        </Card>
+      {(selectedZone === 'market' || selectedZone === 'library' || selectedZone === 'arena' || selectedZone === 'sanctuary') && (
+        <ZoneContent zoneId={selectedZone} stats={stats} />
       )}
     </div>
   );
